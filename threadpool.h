@@ -16,6 +16,7 @@ namespace nogu {
     class threadpool {
     public:
         threadpool(size_t _n);
+
         ~threadpool();
 
         template<typename F>
@@ -56,7 +57,7 @@ namespace nogu {
             shutdown = true;
         }
         cv_.notify_all();
-        for(auto &i:workers_){
+        for (auto &i:workers_) {
             i.join();
         }
     }
