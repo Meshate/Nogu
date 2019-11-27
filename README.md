@@ -1,4 +1,4 @@
-# NoGu
+# Nogu
 一个闲来无事的垃圾轮子库
 ### threadpool
 一个以modern c++的stl为基础实现的高性能(应该)线程池
