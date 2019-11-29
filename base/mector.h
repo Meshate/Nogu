@@ -27,29 +27,72 @@ namespace nogu {
             this->_Set_value(0, cap, item);
         }
 
-        mector(std::initializer_list<T> &&items) {
+        mector(std::initializer_list<T> items) {
             this->_Init(items.size(), items.size());
             this->_Set_value(items);
-            items = 0;
+        }
+
+        mector(T *begin, T *end) {
+            size_t len = end - begin;
+            this->_Init(len, len);
+            this->_Set_value(begin, len);
+        }
+
+        mector(const mector &other) {
+            this->_Init(other._p->cap, other._p->size);
+            this->_Set_value(other._p->m, other._p->size * sizeof(T));
+        }
+
+        mector(mector &&other) noexcept {
+            _p = other._p;
+            other._p = nullptr;
         }
 
         ~mector() {
-            if (!_p)return;
-            if (_p->ref_count == 1)free(_p);
-            _p = 0;
+            if (_p)free(_p);
         }
 
         T &operator[](size_t n) const { return *(_p->m + n); }
 
-        size_t size() const { return _p ? _p->size : 0; }
+        mector<T> &operator=(const mector &other) {
+            if (other != *this) {
+                this->_Init(other._p->cap, other._p->size);
+                this->_Set_value(other._p->m, other._p->size * sizeof(T));
+            }
+        }
 
-        size_t capacity() const { return _p ? _p->cap : 0; }
+        mector<T> &operator=(mector &&other) noexcept {
+            _p = other._p;
+            other._p = nullptr;
+        }
 
-        iterator begin() const { return _p ? _p->m : 0; }
+        const int size() const {
+            return _p ? _p->size : 0;
+        }
 
-        iterator end() const { return _p ? (_p->m + _p->size) : 0; }
+        const int capacity() const {
+            return _p ? _p->cap : 0;
+        }
 
-        bool empty() const { return !_p || _p->size == 0; }
+        iterator begin() const {
+            return _p ? _p->m : 0;
+        }
+
+        iterator end() const {
+            return _p ? (_p->m + _p->size) : 0;
+        }
+
+        bool empty() const {
+            return !_p || _p->size == 0;
+        }
+
+        T &front() const {
+            return *(_p->m);
+        }
+
+        T &back() const {
+            return *(_p->m + _p->size - 1);
+        }
 
         void push_back(const T &item) {
             if (!_p)this->_Init(1);
@@ -66,8 +109,30 @@ namespace nogu {
             item = 0;
         }
 
+        template <typename... Args>
+        void emplace_back(Args... args){
+
+        }
+
         void pop() {
             if (_p)_p->size--;
+        }
+
+        void swap(mector &other) {
+            if (other != *this) {
+                _Mem *p = _p;
+                _p = other._p;
+                other._p = p;
+            }
+        }
+
+        void reserve(size_t n) {
+            _p ? this->_Reserve(n) : this->_Init(n);
+        }
+
+        void resize(size_t n) {
+            _p ? this->_Reserve(n) : this->_Init(n);
+            _p->size = n;
         }
 
     private:
@@ -81,15 +146,18 @@ namespace nogu {
             }
         }
 
-        inline void _Set_value(T items[],size_t n) {
+        inline void _Set_value(T items[], size_t n) {
             memcpy(_p->m, items, n);
+        }
+
+        inline void _Set_value(std::initializer_list<T> items) {
+            memcpy(_p->m, items.begin(), sizeof(T) * items.size());
         }
 
     private:
         struct _Mem {
             size_t cap;
             size_t size;
-            size_t ref_count;
             T m[];
         };
 
@@ -101,23 +169,14 @@ namespace nogu {
         _p = (_Mem *) malloc(sizeof(_Mem) + cap * sizeof(T));
         _p->size = size;
         _p->cap = cap;
-        _p->ref_count = 1;
     }
 
     template<typename T>
     void mector<T>::_Reserve(size_t cap) {
         if (_p->cap < cap) {
-            if (_p->ref_count == 1) {
-                _p = (_Mem *) realloc(_p, sizeof(_Mem) + cap * sizeof(T));
-                assert(_p);
-                _p->cap = cap;
-            } else {
-                --_p->ref_count;
-                T *t = _p->m;
-                size_t size = _p->size;
-                this->_Init(cap, _p->size);
-                this->_Set_value(t,size);
-            }
+            _p = (_Mem *) realloc(_p, sizeof(_Mem) + cap * sizeof(T));
+            assert(_p);
+            _p->cap = cap;
         }
     }
 
@@ -129,7 +188,7 @@ namespace nogu {
         for (auto i = mec.begin(); i != mec.end(); ++i) {
             out << " " << *i;
         }
-        out<<" }";
+        out << " }";
         return out;
     }
 } //nogu
