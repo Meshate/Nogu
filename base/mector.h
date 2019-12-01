@@ -94,27 +94,38 @@ namespace nogu {
             return *(_p->m + _p->size - 1);
         }
 
+        void clear() {
+            if (_p)_p->size = 0;
+        }
+
+        const T *data() const {
+            if (_p)return _p->m;
+        }
+
         void push_back(const T &item) {
             if (!_p)this->_Init(1);
             else if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
-            *(_p->m + _p->size) = item;
+            _p->m[_p->size] = item;
             _p->size++;
         }
 
         void push_back(T &&item) {
             if (!_p)this->_Init(1);
             else if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
-            *(_p->m + _p->size) = item;
+            _p->m[_p->size] = item;
             _p->size++;
             item = 0;
         }
 
-        template <typename... Args>
-        void emplace_back(Args... args){
-
+        template<typename... Args>
+        void emplace_back(Args &&... args) {
+            if (!_p)this->_Init(1);
+            else if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
+            ::new(_p->m + _p->size) T(std::forward<Args>(args)...);
+            _p->size++;
         }
 
-        void pop() {
+        void pop_back() {
             if (_p)_p->size--;
         }
 
@@ -142,7 +153,7 @@ namespace nogu {
 
         inline void _Set_value(size_t begin, size_t end, T item) {
             for (int i = begin; i < end; ++i) {
-                *(_p->m + i) = item;
+                _p->m[i] = item;
             }
         }
 

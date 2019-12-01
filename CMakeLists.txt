@@ -3,4 +3,4 @@ project(NoGu)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(NoGu main.cpp base/threadpool.h base/mector.h)
+add_executable(NoGu main.cpp base/threadpool.h base/mector.h base/gualloctor.h base/gustring.cpp )
