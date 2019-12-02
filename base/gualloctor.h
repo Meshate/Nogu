@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include <mutex>
 
-#define THREADS_SAFE
+//#define THREADS_SAFE
 
 namespace nogu {
     template<typename T, size_t block_size = 4096>

@@ -2,7 +2,7 @@
 #include "base/threadpool.h"
 #include "base/mector.h"
 #include <vector>
-#import "base/gualloctor_test.h"
+#include "base/gualloctor_test.h"
 
 using namespace std;
 
@@ -23,28 +23,12 @@ void thread_test() {
 }
 
 void mec_test() {
-    nogu::mector<int> a{22, 421, 222};
-    cout << a << endl;
-    if (!a.empty())a.push_back(213);
-    a.push_back(43232);
-    int t = 32;
-    a.push_back(t);
-    cout << a << endl;
-
-    nogu::mector<int> c(a);
-    a.push_back(3432234);
-    c.emplace_back(1);
-    cout << a.front() << endl;
-    cout << c.back() << endl;
-}
-
-void mec_bench() {
     const int t1 = 10000;
     const int t2 = 10000;
     {
         vector<int> t;
-        clock_t cl;
-        cl = clock();
+        clock_t start;
+        start = clock();
         for (int i = 0; i < t1; ++i) {
             for (int j = 0; j < t2; ++j) {
                 t.push_back(i + j);
@@ -56,13 +40,13 @@ void mec_bench() {
             }
         }
         if (t.empty())cout << "vector OK\n";
-        cout << "time: " << clock() - cl << endl;
+        cout << "time: " << (((double) clock() - start) / CLOCKS_PER_SEC) << endl;
     }
 
     {
         nogu::mector<int> t;
-        clock_t cl;
-        cl = clock();
+        clock_t start;
+        start = clock();
         for (int i = 0; i < t1; ++i) {
             for (int j = 0; j < t2; ++j) {
                 t.push_back(i + j);
@@ -74,19 +58,20 @@ void mec_bench() {
             }
         }
         if (t.empty())cout << "mector OK\n";
-        cout << "time: " << clock() - cl << endl;
+        cout << "time: " << (((double) clock() - start) / CLOCKS_PER_SEC) << endl;
     }
 }
 
 int main() {
-//    thread_test();
-
-//    mec_test();
-
-//    bench1();
-//    bench2();
-
-    gulloctor_test();
+    {
+        thread_test();
+    }
+    {
+        mec_test();
+    }
+    {
+        gulloctor_test();
+    }
 
     return 0;
 }

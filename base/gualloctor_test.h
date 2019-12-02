@@ -62,8 +62,8 @@ private:
     _Node *_head;
 };
 
-const int ELEMS = 1000000;
-const int REPS = 100;
+const int ELEMS = 100000;
+const int REPS = 1000;
 
 void gulloctor_test() {
     {
