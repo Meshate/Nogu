@@ -7,6 +7,7 @@
 
 #include <ostream>
 #include <cstdlib>
+#include <cstring>
 
 namespace nogu {
     class gustring {
@@ -15,26 +16,25 @@ namespace nogu {
     public:
         gustring() : _p(0) {}
 
-        gustring(size_t cap) {
+        explicit gustring(size_t cap) {
             this->_Init(cap);
-            this->_Set_value(0, cap, 0);
         }
 
         gustring(size_t cap, char item) {
-            this->_Init(cap, cap);
-            this->_Set_value(0, cap, item);
+            this->_Init(cap + 1, cap);
+            memset(_p->m, item, cap);
         }
 
-
-        gustring(char *begin, char *end) {
-            size_t len = end - begin;
-            this->_Init(len, len);
-            this->_Set_value(begin, len);
+        gustring(char item, size_t cap) {
+            this->_Init(cap + 1, cap);
+            memset(_p->m, item, cap);
         }
+
+        gustring(const char *s);
 
         gustring(const gustring &other) {
-            this->_Init(other._p->cap, other._p->size);
-            this->_Set_value(other._p->m, other._p->size * sizeof(char));
+            _p = other._p;
+            _p->ref_count++;
         }
 
         gustring(gustring &&other) noexcept {
@@ -43,16 +43,27 @@ namespace nogu {
         }
 
         ~gustring() {
-            if (_p)free(_p);
+            if (!_p) return;
+            if (--_p->ref_count == 0) free(_p);
+            _p = 0;
         }
 
-        char &operator[](size_t n) const { return *(_p->m + n); }
+        char &operator[](size_t n) const { return _p->m[n]; }
 
-        gustring &operator=(const gustring &other);
+        gustring &operator=(const gustring &other) {
+            if (&other != this) {
+                if (_p && --_p->ref_count == 0) free(_p);
+                _p = other._p;
+                if (_p) _p->ref_count++;
+            }
+            return *this;
+        }
 
         gustring &operator=(gustring &&other) noexcept {
+            if (_p && --_p->ref_count == 0) free(_p);
             _p = other._p;
             other._p = nullptr;
+            return *this;
         }
 
         const int size() const {
@@ -80,17 +91,22 @@ namespace nogu {
         }
 
         const char *data() const {
-            if (_p)return _p->m;
+            return _p ? _p->m : 0;
+        }
+
+        const char* c_str()const {
+            return _p ? _p->m : 0;
         }
 
 
-        void swap(gustring &other) {
-            if (other != *this) {
-                _Mem *p = _p;
-                _p = other._p;
-                other._p = p;
-            }
-        }
+
+//        void swap(gustring &other) {
+//            if (other != *this) {
+//                _Mem *p = _p;
+//                _p = other._p;
+//                other._p = p;
+//            }
+//        }
 
         void reserve(size_t n) {
             _p ? this->_Reserve(n) : this->_Init(n);
@@ -101,20 +117,16 @@ namespace nogu {
             _p->size = n;
         }
 
+        gustring &operator=(const char *s);
+
     private:
         void _Init(size_t cap, size_t size = 0);
 
         void _Reserve(size_t cap);
 
-        inline void _Set_value(size_t begin, size_t end, char item) {
-            for (int i = begin; i < end; ++i) {
-                *(_p->m + i) = item;
-            }
-        }
+        void _Ensure(size_t n);
 
-        inline void _Set_value(char items[], size_t n) {
-            memcpy(_p->m, items, n);
-        }
+        gustring& _Append(const char * s, size_t n);
 
     private:
         struct _Mem {

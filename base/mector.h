@@ -52,18 +52,20 @@ namespace nogu {
             if (_p)free(_p);
         }
 
-        T &operator[](size_t n) const { return *(_p->m + n); }
+        T &operator[](size_t n) const { return _p->m[n]; }
 
         mector<T> &operator=(const mector &other) {
             if (other != *this) {
                 this->_Init(other._p->cap, other._p->size);
                 this->_Set_value(other._p->m, other._p->size * sizeof(T));
             }
+            return *this;
         }
 
         mector<T> &operator=(mector &&other) noexcept {
             _p = other._p;
             other._p = nullptr;
+            return *this;
         }
 
         const int size() const {
@@ -99,19 +101,19 @@ namespace nogu {
         }
 
         const T *data() const {
-            if (_p)return _p->m;
+            return _p ? _p->m : 0;
         }
 
         void push_back(const T &item) {
             if (!_p)this->_Init(1);
-            else if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
+            if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
             _p->m[_p->size] = item;
             _p->size++;
         }
 
         void push_back(T &&item) {
             if (!_p)this->_Init(1);
-            else if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
+            if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
             _p->m[_p->size] = item;
             _p->size++;
             item = 0;
@@ -120,9 +122,46 @@ namespace nogu {
         template<typename... Args>
         void emplace_back(Args &&... args) {
             if (!_p)this->_Init(1);
-            else if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
+            if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
             ::new(_p->m + _p->size) T(std::forward<Args>(args)...);
             _p->size++;
+        }
+
+        iterator insert(const iterator pos, const T &x) {
+            if (!_p)this->_Init(1);
+            if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
+            memcpy(pos+1,pos,end()-pos);
+            _p->size++;
+            *pos = x;
+            return pos;
+        }
+
+        iterator insert(const iterator pos, T &&x) {
+            if (!_p)this->_Init(1);
+            if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
+            memmove(pos+1,pos,(end()-pos)* sizeof(T));
+            _p->size++;
+            *pos = x;
+            x = 0;
+            return pos;
+        }
+
+        iterator erase(const iterator pos) {
+            if (!_p)return nullptr;
+            _p->size--;
+            for (iterator i = pos; i != end(); ++i) {
+                *i = *(i + 1);
+            }
+            return pos;
+        }
+
+        iterator erase(const iterator begin, const iterator end) {
+            if (!_p)return nullptr;
+            _p->size -= end - begin;
+            for (int i = 0; i < end - begin; ++i) {
+                *(begin + i) = *(end + i);
+            }
+            return begin;
         }
 
         void pop_back() {
@@ -130,7 +169,7 @@ namespace nogu {
         }
 
         void swap(mector &other) {
-            if (other != *this) {
+            if (&other != this) {
                 _Mem *p = _p;
                 _p = other._p;
                 other._p = p;

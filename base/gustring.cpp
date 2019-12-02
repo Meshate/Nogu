@@ -7,14 +7,65 @@
 namespace nogu {
 
     void gustring::_Init(size_t cap, size_t size) {
-
+        _p = (_Mem *) malloc(sizeof(_Mem) + cap);
+        _p->size = size;
+        _p->cap = cap;
+        _p->ref_count = 1;
     }
 
     void gustring::_Reserve(size_t cap) {
-
+        if (_p->cap < cap) {
+            if (_p->ref_count == 1) {
+                _p = (_Mem *) realloc(_p, cap + sizeof(_Mem));
+                assert(_p);
+                _p->cap = cap;
+            } else {
+                --_p->ref_count;
+                char *s = _p->m;
+                this->_Init(cap, _p->size);
+                memcpy(_p->m, s, _p->size);
+            }
+        }
     }
 
-    gustring &gustring::operator=(const gustring &other) {
-        return <#initializer#>;
+    gustring::gustring(const char *s) {
+        if (!*s) {
+            _p = 0;
+            return;
+        }
+        size_t n = strlen(s);
+        this->_Init(n + 1, n);
+        memcpy(_p->m, s, n + 1);
     }
-}
+
+    gustring &gustring::operator=(const char *s) {
+        if (!*s) {
+            this->clear();
+            return *this;
+        }
+
+        size_t n = strlen(s);
+        if (_p) {
+            this->_Reserve(n + 1);
+        } else {
+            this->_Init(n + 1, n);
+        }
+        memcpy(_p->m, s, n + 1);
+        return *this;
+    }
+
+    void gustring::_Ensure(size_t n) {
+        if(_p->cap < _p->size + n){
+            this->_Reserve(_p->cap *2 +n);
+        }
+    }
+
+    gustring &gustring::_Append(const char * s, size_t n) {
+        _p ? this->_Ensure(n): this->_Init(n + 1);
+        memcpy(_p->m + _p->size, s, n);
+        _p->size += n;
+        return *this;
+    }
+
+
+}//nogu
