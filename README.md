@@ -5,7 +5,7 @@
 ## mector
 一个高性能可变长数组
 ## gualloctor
-简单内存池
+线程安全的内存池
 ## gustring(TODO)
 字符串库
 ## gutrans(TODO)

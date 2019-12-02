@@ -2,7 +2,7 @@
 #include "base/threadpool.h"
 #include "base/mector.h"
 #include <vector>
-#include <memory>
+#import "base/gualloctor_test.h"
 
 using namespace std;
 
@@ -85,6 +85,8 @@ int main() {
 
 //    bench1();
 //    bench2();
+
+    gulloctor_test();
 
     return 0;
 }
