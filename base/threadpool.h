@@ -15,12 +15,12 @@
 namespace nogu {
     class threadpool {
     public:
-        threadpool(size_t _n);
+        explicit threadpool(size_t _n);
 
         ~threadpool();
 
-        template<typename F>
-        void add_task(F &&f);
+        template<typename F, typename... Args>
+        void add_task(F &&f, Args &&...args);
 
     private:
         std::queue<std::function<void()>> tasks_;
@@ -62,12 +62,17 @@ namespace nogu {
         }
     }
 
-    //TODO 添加函数参数支持 template<typename F, typename... Args>
-    template<typename F>
-    void threadpool::add_task(F &&f) {
+    //TODO 找出当F的参数为引用时无法改变值的原因
+    template<typename F, typename... Args>
+    void threadpool::add_task(F &&f, Args &&...args) {
         {
             std::unique_lock<std::mutex> lk(mtx_);
-            tasks_.emplace(std::forward<F>(f));
+            auto func = std::make_shared<std::function<void()>>(std::function<void()>(
+                    std::bind(std::forward<F>(f), std::forward<Args>(args)...)
+                    ));
+            tasks_.emplace([func]{
+                (*func)();
+            });
         }
         cv_.notify_one();
     }

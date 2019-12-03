@@ -55,16 +55,45 @@ namespace nogu {
     }
 
     void gustring::_Ensure(size_t n) {
-        if(_p->cap < _p->size + n){
-            this->_Reserve(_p->cap *2 +n);
+        if (_p->cap < _p->size + n) {
+            this->_Reserve(_p->cap * 2 + n);
         }
     }
 
-    gustring &gustring::_Append(const char * s, size_t n) {
-        _p ? this->_Ensure(n): this->_Init(n + 1);
-        memcpy(_p->m + _p->size, s, n);
-        _p->size += n;
+    gustring &gustring::append(char c) {
+        _p ? this->_Ensure(1) : this->_Init(8);
+        _p->m[_p->size++] = c;
         return *this;
+    }
+
+    gustring &gustring::append(char c, size_t n) {
+        _p ? this->_Ensure(n) : this->_Init(n + 1);
+        memset(_p->m + _p->size, c, n);
+        _p->size += (unsigned) n;
+        return *this;
+    }
+
+    gustring &gustring::append(const char *s) {
+        size_t len = strlen(s);
+        _p ? this->_Ensure(len) : this->_Init(len + 1);
+        memcpy(_p->m + _p->size, s, len);
+        _p->size += len;
+        return *this;
+    }
+
+    gustring &gustring::append(const gustring &s) {
+        if (&s != this) {
+            return this->append(s.data());
+        } else if (_p) {
+            this->_Reserve(_p->size*2);
+            memcpy(_p->m + _p->size, _p->m, _p->size);
+            _p->size *= 2;
+        }
+        return *this;
+    }
+
+    gustring gustring::operator()(size_t b, size_t e) {
+        if(e == 0x7fffffff)e = this->_p->size;
     }
 
 

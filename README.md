@@ -10,19 +10,15 @@
 using namespace std;
 
 int main(){
-    mutex rt;
-        int num = 0;
+    int num = 0;
         {
-            nogu::threadpool pool(8);
+            nogu::threadpool pool(4);
     
-            for (int i = 0; i < 100; ++i) {
-                pool.add_task([&] {
-                    lock_guard<mutex> lk(rt);
-                    ++num;
-                    cout << num << endl;
-                });
-            }
+            pool.add_task([](int *p){
+                    ++(*p);
+                }, &num);//若参数为引用则无法改变参数的值
         }
+        cout<<num<<endl;
     return 0;
 }
 ```

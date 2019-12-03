@@ -49,5 +49,11 @@ int main(){
     def_case(pb = tb.insert(tb.begin(),0));
     def_case(pa = ta.insert(ta.end()-1,0));
     def_case(pb = tb.insert(tb.end()-1,0));
+
+    std::cout<<"========= erase =========\n";
+    def_case(pa = ta.erase(ta.begin()));
+    def_case(pb = tb.erase(tb.begin()));
+    def_case(pa = ta.erase(ta.end()-1));
+    def_case(pb = tb.erase(tb.end()-1));
 }
 

@@ -89,11 +89,11 @@ namespace nogu {
         }
 
         T &front() const {
-            return *(_p->m);
+            return _p->m[0];
         }
 
         T &back() const {
-            return *(_p->m + _p->size - 1);
+            return _p->m[_p->size - 1];
         }
 
         void clear() {
@@ -130,7 +130,7 @@ namespace nogu {
         iterator insert(const iterator pos, const T &x) {
             if (!_p)this->_Init(1);
             if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
-            memcpy(pos+1,pos,end()-pos);
+            memcpy(pos + 1, pos, end() - pos);
             _p->size++;
             *pos = x;
             return pos;
@@ -139,7 +139,7 @@ namespace nogu {
         iterator insert(const iterator pos, T &&x) {
             if (!_p)this->_Init(1);
             if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
-            memmove(pos+1,pos,(end()-pos)* sizeof(T));
+            memmove(pos + 1, pos, (end() - pos) * sizeof(T));
             _p->size++;
             *pos = x;
             x = 0;
@@ -148,19 +148,15 @@ namespace nogu {
 
         iterator erase(const iterator pos) {
             if (!_p)return nullptr;
+            memmove(pos, pos + 1, (end() - pos - 1) * sizeof(T));
             _p->size--;
-            for (iterator i = pos; i != end(); ++i) {
-                *i = *(i + 1);
-            }
             return pos;
         }
 
         iterator erase(const iterator begin, const iterator end) {
             if (!_p)return nullptr;
+            memmove(begin, end, (end() - end) * sizeof(T));
             _p->size -= end - begin;
-            for (int i = 0; i < end - begin; ++i) {
-                *(begin + i) = *(end + i);
-            }
             return begin;
         }
 

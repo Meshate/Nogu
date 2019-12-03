@@ -48,7 +48,11 @@ namespace nogu {
             _p = 0;
         }
 
-        char &operator[](size_t n) const { return _p->m[n]; }
+        char &operator[](size_t n) const {
+            return _p->m[n];
+        }
+
+        gustring operator()(size_t b=0,size_t e=0x7fffffff);
 
         gustring &operator=(const gustring &other) {
             if (&other != this) {
@@ -86,6 +90,14 @@ namespace nogu {
             return !_p || _p->size == 0;
         }
 
+        char &front() const {
+            return _p->m[0];
+        }
+
+        char &back() const {
+            return _p->m[_p->size - 1];
+        }
+
         void clear() {
             if (_p)_p->size = 0;
         }
@@ -94,11 +106,24 @@ namespace nogu {
             return _p ? _p->m : 0;
         }
 
-        const char* c_str()const {
-            return _p ? _p->m : 0;
+        const char *c_str() const {
+            if (!_p) return nullptr;
+            const_cast<gustring *>(this)->_Reserve(_p->size + 1);
+            if (_p->m[_p->size] != '\0') _p->m[_p->size] = '\0';
+            return _p->m;
         }
 
+        gustring &append(char c);
 
+        gustring &append(char c, size_t n);
+
+        gustring &append(size_t n, char c) {
+            return append(c, n);
+        }
+
+        gustring &append(const char *s);
+
+        gustring &append(const gustring &s);
 
 //        void swap(gustring &other) {
 //            if (other != *this) {
@@ -125,8 +150,6 @@ namespace nogu {
         void _Reserve(size_t cap);
 
         void _Ensure(size_t n);
-
-        gustring& _Append(const char * s, size_t n);
 
     private:
         struct _Mem {
