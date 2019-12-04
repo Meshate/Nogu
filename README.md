@@ -4,7 +4,7 @@
 一个简陋的高性能(应该)线程池
 ### example
 ```c++
-#include "base/threadpool"
+#include "nogu.h"
 #include <iostream>
 
 using namespace std;
@@ -27,7 +27,7 @@ int main(){
 ### example
 ```c++
 #include <iostream>
-#include "base/mector.h"
+#include "nogu.h"
 using namespace std;
 
 int main(){ //just use like vector
@@ -50,7 +50,7 @@ int main(){ //just use like vector
 线程安全的内存池
 ### example
 ```c++
-#include "base/gulloctor"
+#include "nogu.h"
 
 #ifndef THREADS_SAFE
 #define THREADS_SAFE //启用线程安全
@@ -65,8 +65,24 @@ int main(){
     return 0;
 }
 ```
-## gustring(TODO)
-字符串库
+## gustring
+高性能字符串库，支持`.`和`*`的正则表达式匹配和Rust风格的`(,)`slice切片。
+### example
+```c++
+#include "nogu.h"
+#include <iostream>
+
+using namespace std;
+
+int main(){
+    nogu::gustring s("aaa");
+    s.match("a*");
+    s.append("dd");
+    s.match("a*.*");
+    
+    return 0;
+}
+```
 ## gutrans(TODO)
 高性能数字转字符串库(规划中，先学会数学)
 ## more

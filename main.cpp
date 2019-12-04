@@ -18,5 +18,7 @@ void thread_test() {
 int main() {
     thread_test();
 
+    nogu::gustring s("abcd");
+
     return 0;
 }
