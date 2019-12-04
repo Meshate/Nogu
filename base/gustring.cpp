@@ -85,7 +85,7 @@ namespace nogu {
         if (&s != this) {
             return this->append(s.data());
         } else if (_p) {
-            this->_Reserve(_p->size*2);
+            this->_Reserve(_p->size * 2);
             memcpy(_p->m + _p->size, _p->m, _p->size);
             _p->size *= 2;
         }
@@ -93,7 +93,28 @@ namespace nogu {
     }
 
     gustring gustring::operator()(size_t b, size_t e) {
-        if(e == 0x7fffffff)e = this->_p->size;
+        if (e == 0x7fffffff)e = this->_p->size;
+    }
+
+    bool gustring::match(const gustring &s) const {
+//        mector<mector<bool>> dp(_p->size + 1, mector<bool>(s.size() + 1, 0));
+        bool dp[_p->size + 1][s.size() + 1];
+        memset(dp, 0, sizeof(dp));
+        dp[_p->size][s.size()] = true;
+        for (int i = _p->size; i >= 0; --i) {
+            for (int j = s.size() - 1; j >= 0; --j) {
+                bool match = false;
+                if (i < _p->size && (_p->m[i] == s[j] || s[j] == '.')) {
+                    match = true;
+                }
+                if (j + 1 < s.size() && s[j + 1] == '*') {
+                    dp[i][j] = dp[i][j + 2] || (match && dp[i + 1][j]);
+                } else {
+                    dp[i][j] = match && dp[i + 1][j + 1];
+                }
+            }
+        }
+        return dp[0][0];
     }
 
 

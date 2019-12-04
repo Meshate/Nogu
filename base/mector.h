@@ -8,7 +8,7 @@
 #include <initializer_list>
 #include <ostream>
 #include <cstdlib>
-
+//TODO fix cant work with mector<mector>
 namespace nogu {
     template<typename T>
     class mector {
@@ -146,6 +146,7 @@ namespace nogu {
             return pos;
         }
 
+        //TODO 找到erase操作比std::vector慢的原因并解决
         iterator erase(const iterator pos) {
             if (!_p)return nullptr;
             memmove(pos, pos + 1, (end() - pos - 1) * sizeof(T));

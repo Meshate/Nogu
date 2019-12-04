@@ -1,7 +1,5 @@
 #include <iostream>
-#include "base/threadpool.h"
-#include "base/mector.h"
-#include <vector>
+#include "nogu.h"
 
 using namespace std;
 
@@ -19,7 +17,6 @@ void thread_test() {
 
 int main() {
     thread_test();
-
 
     return 0;
 }

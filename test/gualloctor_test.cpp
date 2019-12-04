@@ -2,7 +2,7 @@
 // Created by meshate on 2019/12/2.
 //
 
-#include "base/gualloctor.h"
+#include "../base/gualloctor.h"
 #include "test.h"
 #include <memory>
 

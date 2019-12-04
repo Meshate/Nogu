@@ -65,12 +65,12 @@ namespace nogu {
     //TODO 找出当F的参数为引用时无法改变值的原因
     template<typename F, typename... Args>
     void threadpool::add_task(F &&f, Args &&...args) {
+        auto func = std::make_shared<std::function<void()>>(std::function<void()>(
+                std::bind(std::forward<F>(f), std::forward<Args>(args)...)
+        ));
         {
             std::unique_lock<std::mutex> lk(mtx_);
-            auto func = std::make_shared<std::function<void()>>(std::function<void()>(
-                    std::bind(std::forward<F>(f), std::forward<Args>(args)...)
-                    ));
-            tasks_.emplace([func]{
+            tasks_.emplace([func] {
                 (*func)();
             });
         }

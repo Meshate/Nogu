@@ -8,6 +8,7 @@
 #include <ostream>
 #include <cstdlib>
 #include <cstring>
+#include "mector.h"
 
 namespace nogu {
     class gustring {
@@ -52,7 +53,7 @@ namespace nogu {
             return _p->m[n];
         }
 
-        gustring operator()(size_t b=0,size_t e=0x7fffffff);
+        gustring operator()(size_t b = 0, size_t e = 0x7fffffff);
 
         gustring &operator=(const gustring &other) {
             if (&other != this) {
@@ -141,6 +142,10 @@ namespace nogu {
             _p ? this->_Reserve(n) : this->_Init(n);
             _p->size = n;
         }
+
+        // . match any one character
+        // * match any number of previous character
+        bool match(const gustring &s) const;
 
         gustring &operator=(const char *s);
 

@@ -4,7 +4,7 @@
 
 #include "test.h"
 #include <vector>
-#include "base/mector.h"
+#include "../base/mector.h"
 
 int main(){
     def_test(100000);
