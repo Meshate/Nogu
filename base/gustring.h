@@ -124,13 +124,17 @@ namespace nogu {
 
         gustring &append(const gustring &s);
 
-//        void swap(gustring &other) {
-//            if (other != *this) {
-//                _Mem *p = _p;
-//                _p = other._p;
-//                other._p = p;
-//            }
-//        }
+        void swap(gustring& s) {
+            if (&s != this) {
+                _Mem* p = _p;
+                _p = s._p;
+                s._p = p;
+            }
+        }
+
+        void swap(gustring&& s) {
+            s.swap(*this);
+        }
 
         void reserve(size_t n) {
             _p ? this->_Reserve(n) : this->_Init(n);
@@ -167,42 +171,96 @@ namespace nogu {
         _Mem *_p;
     };
 
-    inline bool operator ==(const gustring& first, const gustring& second){
+    inline bool operator==(const gustring &first, const gustring &second) {
         if (first.size() != second.size()) return false;
         return first.empty() || memcmp(first.data(), second.data(), first.size()) == 0;
     }
 
-    inline bool operator ==(const gustring& first, const char* second){
+    inline bool operator==(const gustring &first, const char *second) {
         if (first.size() != strlen(second)) return false;
         return first.empty() || memcmp(first.data(), second, first.size()) == 0;
     }
 
-    inline bool operator ==(const char * first, const gustring& second){
+    inline bool operator==(const char *first, const gustring &second) {
         return second == first;
     }
 
-    inline bool operator !=(const gustring& first, const gustring& second){
+    inline bool operator!=(const gustring &first, const gustring &second) {
         return !(first == second);
     }
 
-    inline gustring operator +(const gustring& first, const gustring& second){
-        return gustring(first.size()+second.size()+1).append(first).append(second);
+    inline bool operator!=(const gustring &first, const char *second) {
+        return !(first == second);
     }
 
-    inline gustring operator +(const gustring& first, const char* second){
-        return gustring(first.size()+strlen(second)+1).append(first).append(second);
+    inline bool operator!=(const char *first, const gustring &second) {
+        return !(first == second);
     }
 
-    inline gustring operator +(const char* first, const gustring& second){
-        return gustring(strlen(first)+second.size()+1).append(first).append(second);
+    inline gustring operator+(const gustring &first, const gustring &second) {
+        return gustring(first.size() + second.size() + 1).append(first).append(second);
     }
 
-    inline gustring operator +(const gustring& first, const char c){
-        return gustring(first.size()+2).append(first).append(c);
+    inline gustring operator+(const gustring &first, const char *second) {
+        return gustring(first.size() + strlen(second) + 1).append(first).append(second);
     }
 
-    inline gustring operator +( const char c,const gustring& second){
-        return gustring(second.size()+2).append(c).append(second);
+    inline gustring operator+(const char *first, const gustring &second) {
+        return gustring(strlen(first) + second.size() + 1).append(first).append(second);
+    }
+
+    inline gustring operator+(const gustring &first, const char c) {
+        return gustring(first.size() + 2).append(first).append(c);
+    }
+
+    inline gustring operator+(const char c, const gustring &second) {
+        return gustring(second.size() + 2).append(c).append(second);
+    }
+
+    inline bool operator>(const gustring &first, const gustring &second) {
+        if (first.size() > second.size()) {
+            return second.empty() || memcmp(first.data(), second.data(), second.size()) >= 0;
+        } else {
+            return memcmp(first.data(), second.data(), first.size()) > 0;
+        }
+    }
+
+    inline bool operator>(const gustring &first, const char *second) {
+        if (first.size() > strlen(second)) {
+            return strlen(second) == 0 || memcmp(first.data(), second, strlen(second)) >= 0;
+        } else {
+            return memcmp(first.data(), second, first.size()) > 0;
+        }
+    }
+
+    inline bool operator<(const gustring &first, const gustring &second) {
+        if (first.size() < second.size()) {
+            return second.empty() || memcmp(first.data(), second.data(), second.size()) <= 0;
+        } else {
+            return memcmp(first.data(), second.data(), first.size()) < 0;
+        }
+    }
+
+    inline bool operator<(const gustring &first, const char *second) {
+        if (first.size() < strlen(second)) {
+            return strlen(second) == 0 || memcmp(first.data(), second, strlen(second)) <= 0;
+        } else {
+            return memcmp(first.data(), second, first.size()) < 0;
+        }
+    }
+
+    inline bool operator>(const char *first, const gustring &second) {
+        return second < first;
+    }
+
+    inline bool operator<(const char *first, const gustring &second) {
+        return second > first;
+    }
+
+
+
+    inline std::ostream &operator<<(std::ostream &os, const gustring &s) {
+        return os << s.c_str();
     }
 }
 

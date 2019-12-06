@@ -228,15 +228,15 @@ namespace nogu {
     }
 
     template<typename T>
-    std::ostream &operator<<(std::ostream &out, const mector<T> &mec) {
-        out << "cap: " << mec.capacity() << '\n';
-        out << "size: " << mec.size() << '\n';
-        out << "data:{";
+    inline std::ostream &operator<<(std::ostream &os, const mector<T> &mec) {
+        os << "cap: " << mec.capacity() << '\n';
+        os << "size: " << mec.size() << '\n';
+        os << "data:{";
         for (auto i = mec.begin(); i != mec.end(); ++i) {
-            out << " " << *i;
+            os << " " << *i;
         }
-        out << " }";
-        return out;
+        os << " }";
+        return os;
     }
 } //nogu
 

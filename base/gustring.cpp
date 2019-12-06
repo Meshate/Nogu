@@ -115,7 +115,7 @@ namespace nogu {
 
     gustring gustring::slice(size_t b, size_t e) {
         if (e == 0)e=_p->size;
-        char *ret = nullptr;
+        char ret[_p->size+1];
         memcpy(ret,_p->m+b,e-b);
         return gustring(ret);
     }
