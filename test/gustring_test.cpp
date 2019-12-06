@@ -11,6 +11,7 @@ int main(){
     nogu::gustring ss = "aaa";
 
     assert(ss.match(".*"));
+    assert(ss+"abc" == "aaaabc");
 
     return 0;
 }

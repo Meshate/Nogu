@@ -66,7 +66,7 @@ int main(){
 }
 ```
 ## gustring
-高性能字符串库，支持`.`和`*`的正则表达式匹配和Rust风格的`(,)`slice切片。
+高性能字符串库，支持`.`和`*`的正则表达式匹配和slice切片。
 ### example
 ```c++
 #include "nogu.h"

@@ -53,8 +53,6 @@ namespace nogu {
             return _p->m[n];
         }
 
-        gustring operator()(size_t b = 0, size_t e = 0x7fffffff);
-
         gustring &operator=(const gustring &other) {
             if (&other != this) {
                 if (_p && --_p->ref_count == 0) free(_p);
@@ -149,6 +147,8 @@ namespace nogu {
 
         gustring &operator=(const char *s);
 
+        gustring slice(size_t b = 0, size_t e = 0);
+
     private:
         void _Init(size_t cap, size_t size = 0);
 
@@ -166,6 +166,44 @@ namespace nogu {
 
         _Mem *_p;
     };
+
+    inline bool operator ==(const gustring& first, const gustring& second){
+        if (first.size() != second.size()) return false;
+        return first.empty() || memcmp(first.data(), second.data(), first.size()) == 0;
+    }
+
+    inline bool operator ==(const gustring& first, const char* second){
+        if (first.size() != strlen(second)) return false;
+        return first.empty() || memcmp(first.data(), second, first.size()) == 0;
+    }
+
+    inline bool operator ==(const char * first, const gustring& second){
+        return second == first;
+    }
+
+    inline bool operator !=(const gustring& first, const gustring& second){
+        return !(first == second);
+    }
+
+    inline gustring operator +(const gustring& first, const gustring& second){
+        return gustring(first.size()+second.size()+1).append(first).append(second);
+    }
+
+    inline gustring operator +(const gustring& first, const char* second){
+        return gustring(first.size()+strlen(second)+1).append(first).append(second);
+    }
+
+    inline gustring operator +(const char* first, const gustring& second){
+        return gustring(strlen(first)+second.size()+1).append(first).append(second);
+    }
+
+    inline gustring operator +(const gustring& first, const char c){
+        return gustring(first.size()+2).append(first).append(c);
+    }
+
+    inline gustring operator +( const char c,const gustring& second){
+        return gustring(second.size()+2).append(c).append(second);
+    }
 }
 
 #endif //NOGU_GUSTRING_H

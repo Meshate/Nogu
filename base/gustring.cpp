@@ -92,10 +92,6 @@ namespace nogu {
         return *this;
     }
 
-    gustring gustring::operator()(size_t b, size_t e) {
-        if (e == 0x7fffffff)e = this->_p->size;
-    }
-
     bool gustring::match(const gustring &s) const {
 //        mector<mector<bool>> dp(_p->size + 1, mector<bool>(s.size() + 1, 0));
         bool dp[_p->size + 1][s.size() + 1];
@@ -115,6 +111,13 @@ namespace nogu {
             }
         }
         return dp[0][0];
+    }
+
+    gustring gustring::slice(size_t b, size_t e) {
+        if (e == 0)e=_p->size;
+        char *ret = nullptr;
+        memcpy(ret,_p->m+b,e-b);
+        return gustring(ret);
     }
 
 
