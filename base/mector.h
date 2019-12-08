@@ -17,7 +17,7 @@ namespace nogu {
     public:
         mector() : _p(0) {}
 
-        mector(size_t cap) {
+        explicit mector(size_t cap) {
             this->_Init(cap);
             this->_Set_value(0, cap, 0);
         }
