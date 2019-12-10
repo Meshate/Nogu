@@ -16,12 +16,31 @@ int main(){
     nogu::mector<int>::iterator pb;
 
     std::cout<<"========= push_back =========\n";
+
+    {
+        class Test{
+            int a;
+            std::string s;
+            char c;
+        } test;
+
+        nogu::mector<Test> sb;
+        std::vector<Test> sa;
+
+        def_case(sa.push_back(test));
+        def_case(sb.push_back(test));
+    }
+
+
+
+
     def_case(ta.push_back(0));
     def_case(tb.push_back(0));
     def_case(ta.push_back(0x7fffffff));
     def_case(tb.push_back(0x7fffffff));
     def_case(ta.push_back(0xffffffff));
     def_case(tb.push_back(0xffffffff));
+
 
     std::cout<<"========= pop_back =========\n";
     def_case(ta.pop_back());

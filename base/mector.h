@@ -8,7 +8,7 @@
 #include <initializer_list>
 #include <ostream>
 #include <cstdlib>
-//TODO fix cant work with mector<mector>
+
 namespace nogu {
     template<typename T>
     class mector {
@@ -52,10 +52,10 @@ namespace nogu {
             if (_p)free(_p);
         }
 
-        T &operator[](size_t n) const { return _p->m[n]; }
+        T &operator[](size_t n) const { return *(_p->m + n); }
 
         mector<T> &operator=(const mector &other) {
-            if (other != *this) {
+            if (&other != this) {
                 this->_Init(other._p->cap, other._p->size);
                 this->_Set_value(other._p->m, other._p->size * sizeof(T));
             }
@@ -89,11 +89,11 @@ namespace nogu {
         }
 
         T &front() const {
-            return _p->m[0];
+            return *(_p->m);
         }
 
         T &back() const {
-            return _p->m[_p->size - 1];
+            return *(_p->m + _p->size - 1);
         }
 
         void clear() {
@@ -107,16 +107,16 @@ namespace nogu {
         void push_back(const T &item) {
             if (!_p)this->_Init(1);
             if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
-            _p->m[_p->size] = item;
+            *(_p->m + _p->size) = item;
             _p->size++;
         }
 
         void push_back(T &&item) {
             if (!_p)this->_Init(1);
             if (_p->size == _p->cap)this->_Reserve(_p->cap * 2);
-            _p->m[_p->size] = item;
+            *(_p->m + _p->size) = item;
             _p->size++;
-            item = 0;
+            item = T();
         }
 
         template<typename... Args>
@@ -205,7 +205,7 @@ namespace nogu {
         struct _Mem {
             size_t cap;
             size_t size;
-            T m[];
+            T m[1];
         };
 
         _Mem *_p;
